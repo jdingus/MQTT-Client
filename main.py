@@ -1,6 +1,6 @@
 import sys
 import paho.mqtt.client as mqtt
-from PyQt5.QtWidgets import QApplication, QTreeView, QTreeWidgetItem, QWidget, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QWidget, QVBoxLayout, QLabel
 
 # Define the MQTT broker address and port
 broker_address = "45.76.236.64"
@@ -23,17 +23,9 @@ selected_topic_value = QLabel("Selected Topic Value: None")
 layout.addWidget(selected_topic_value)
 
 # Create the tree view widget
-tree_view = QTreeView()
-tree_view.setHeaderHidden(False)
-tree_view.setColumnCount(2)
-
-# Create the root item and set its header labels
-root_item = QTreeWidgetItem()
-root_item.setText(0, "Topic")
-root_item.setText(1, "Payload")
-tree_view.setHeaderItem(root_item)
-
-layout.addWidget(tree_view)
+tree_widget = QTreeWidget()
+tree_widget.setHeaderLabels(["Topic", "Payload"])
+layout.addWidget(tree_widget)
 
 # Define the callback function for when a message is received
 def on_message(client, userdata, message):
@@ -51,38 +43,31 @@ client.on_message = on_message
 # Subscribe to the desired topics
 client.subscribe("#")
 
+# Create a dictionary to hold the items in the tree
+items = {}
+
 # Create the custom function to update the tree view
 def update_gui(topic, payload):
     # Split the topic into separate levels
     levels = topic.split("/")
-    # Set the root item of the tree view
-    root_item = tree_view.invisibleRootItem()
     # Traverse the tree to the correct node and add the payload as a leaf
-    current_item = root_item
+    current_item = tree_widget.invisibleRootItem()
     for level in levels:
-        found = False
-        # Check if the current level already exists in the tree
-        for child_item in current_item.takeChildren():
-            if child_item.text(0) == level:
-                current_item = child_item
-                found = True
-                break
-        # If the current level does not exist, add it to the tree
-        if not found:
-            new_item = QTreeWidgetItem(current_item, [level, ''])
-            current_item.addChild(new_item)
-            current_item = new_item
+        if level not in items:
+            # Create a new item if it does not exist
+            items[level] = QTreeWidgetItem(current_item, [level, ''])
+        current_item = items[level]
     # Set the payload as the second column of the current item
     current_item.setText(1, payload)
     # print(f"Updated GUI with message: {topic} - {payload}")
     print('Data Object:', [current_item.text(0), current_item.text(1)])
 
-# Connect the function to the tree_view's clicked signal
-def on_tree_view_item_clicked(item, column):
+# Connect the function to the tree_widget's item clicked signal
+def on_tree_widget_item_clicked(item, column):
     # Set the selected topic value label to the payload of the selected item
     selected_topic_value.setText(f"Selected Topic Value: {item.text(1)}")
 
-tree_view.itemClicked.connect(on_tree_view_item_clicked)
+tree_widget.itemClicked.connect(on_tree_widget_item_clicked)
 
 # Start the MQTT client loop in a separate thread
 client.loop_start()

@@ -1,0 +1,14 @@
+# Python files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+
+# Miscellaneous
+.DS_Store
+*.swp
+*.swo
