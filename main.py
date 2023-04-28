@@ -25,7 +25,14 @@ layout.addWidget(selected_topic_value)
 # Create the tree view widget
 tree_view = QTreeView()
 tree_view.setHeaderHidden(False)
-tree_view.setHeaderLabels(["Topic", "Payload"])
+tree_view.setColumnCount(2)
+
+# Create the root item and set its header labels
+root_item = QTreeWidgetItem()
+root_item.setText(0, "Topic")
+root_item.setText(1, "Payload")
+tree_view.setHeaderItem(root_item)
+
 layout.addWidget(tree_view)
 
 # Define the callback function for when a message is received
