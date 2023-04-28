@@ -24,6 +24,8 @@ layout.addWidget(selected_topic_value)
 
 # Create the tree view widget
 tree_view = QTreeView()
+tree_view.setHeaderHidden(False)
+tree_view.setColumnCount(2)
 tree_view.setHeaderLabels(["Topic", "Payload"])
 layout.addWidget(tree_view)
 
